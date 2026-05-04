@@ -1,0 +1,12 @@
+# Exclude datasets
+images/DDIM/
+images/mmcelebahq/
+
+# Exclude logs
+logs_linear_head/
+
+# Exclude large model checkpoint
+imagebind_ckpt.pth
+
+# Exclude python cache
+__pycache__/
