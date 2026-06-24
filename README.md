@@ -61,7 +61,7 @@ python cross_domain.py \
 
 - imagebind **[ImageBind](https://arxiv.org/abs/2305.05665)** 
 
-- flamingo9b **[ImageBind](https://arxiv.org/abs/2308.01390)**
+- flamingo9b **[Flamingo](https://arxiv.org/abs/2308.01390)**
 
 ## 📚 References & Credits
 
