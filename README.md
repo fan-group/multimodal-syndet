@@ -7,6 +7,9 @@ This framework provides an end-to-end pipeline for **cross-domain deepfake analy
 
 The core of this project is a **unified inference engine** that abstracts the complexities of multiple VLM backbones into a single command-line interface, allowing for rapid benchmarking across different architectural families.
 
+
+## ⚙️ Installation
+This project requires **Python 3.8**.
 1. Create and activate an environment:
 
 ```bash
