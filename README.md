@@ -4,20 +4,7 @@
 
 ## ℹ️ Overview
 This framework provides an end-to-end pipeline for **cross-domain deepfake analysis**. It leverages state-of-the-art Vision-Language Models (VLMs) to extract high-dimensional embeddings, which are then used to train and evaluate linear classifiers for synthetic media detection.
-
-The core of this project is a **unified inference engine** that abstracts the complexities of multiple VLM backbones into a single command-line interface, allowing for rapid benchmarking across different architectural families.
-
-## Supported Model Arguments:
-
-- clip-vit-base-patch32 https://arxiv.org/abs/2103.00020 
-
-- clip-vit-base-patch16 https://arxiv.org/abs/2103.00020 
-
-- clip-vit-large-patch14 https://arxiv.org/abs/2103.00020 
-
-- imagebind https://arxiv.org/abs/2305.05665 
-
-- flamingo9b https://arxiv.org/abs/2308.01390 
+The purpose of this project is to probe the **separability of the vision backbones** of state-of-the-art Vision-Language Models for deepfake detection: by training a simple linear classifier on the extracted embeddings, it measures how well each backbone's representation space alone separates real from synthetic media.
 
 ## ⚙️ Installation
 This project requires **Python 3.8**.
@@ -64,6 +51,17 @@ python cross_domain.py \
   --model imagebind \
   --batch_size 2
 ```
+## Supported Model Arguments:
+
+- clip-vit-base-patch32 https://arxiv.org/abs/2103.00020 
+
+- clip-vit-base-patch16 https://arxiv.org/abs/2103.00020 
+
+- clip-vit-large-patch14 https://arxiv.org/abs/2103.00020 
+
+- imagebind https://arxiv.org/abs/2305.05665 
+
+- flamingo9b https://arxiv.org/abs/2308.01390 
 
 ## 📚 References & Credits
 
