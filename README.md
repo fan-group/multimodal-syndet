@@ -53,15 +53,15 @@ python cross_domain.py \
 ```
 ## Supported Model Arguments:
 
-- clip-vit-base-patch32 https://arxiv.org/abs/2103.00020 
+- clip-vit-base-patch32 **[CLIP](https://arxiv.org/abs/2103.00020)**
 
-- clip-vit-base-patch16 https://arxiv.org/abs/2103.00020 
+- clip-vit-base-patch16 
 
-- clip-vit-large-patch14 https://arxiv.org/abs/2103.00020 
+- clip-vit-large-patch14 
 
-- imagebind https://arxiv.org/abs/2305.05665 
+- imagebind **[ImageBind](https://arxiv.org/abs/2305.05665)** 
 
-- flamingo9b https://arxiv.org/abs/2308.01390 
+- flamingo9b **[ImageBind](https://arxiv.org/abs/2308.01390)**
 
 ## 📚 References & Credits
 
