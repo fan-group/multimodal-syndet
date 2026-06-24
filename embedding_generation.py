@@ -80,14 +80,6 @@ def clip_embeddings(args):
 
 
 def imagebind_embeddings(args):
-    
-    
-    checkpoint_path = hf_hub_download(
-        repo_id="jrobe187/LVLMDFD-checkpoint",
-        filename="imagebind_ckpt.pth"
-    )
-
-
 
     # 1. Model Initialization (Done once)
     model_args = {

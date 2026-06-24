@@ -1,6 +1,13 @@
+import types
+import sys
+import torchvision.transforms.functional as _F
+
+_shim = types.ModuleType("torchvision.transforms.functional_tensor")
+_shim.rgb_to_grayscale = _F.rgb_to_grayscale
+sys.modules["torchvision.transforms.functional_tensor"] = _shim
+
 import argparse
 from embedding_generation import *
-import sys
 from sklearn.model_selection import train_test_split
 import os
 import time
@@ -19,6 +26,7 @@ try:
     _HAS_SKLEARN = True
 except ImportError:
     _HAS_SKLEARN = False
+
 
 
 def set_seed(seed):
@@ -81,7 +89,7 @@ def evaluate(model, loader, device, num_classes):
             all_labels.append(lab.cpu())
 
     avg_loss = total_loss / max(total, 1)
-    acc_top1 = correct / max(total, 1)
+    acc = correct / max(total, 1)
 
     # Concatenate for top-k and AUC
     logits_all = torch.cat(all_logits, dim=0)      # (N, C)
@@ -112,7 +120,7 @@ def evaluate(model, loader, device, num_classes):
 
     metrics = {
         "avg_loss": avg_loss,
-        "top1": acc_top1,
+        "top1": acc,
         "auc_macro": auc_macro_score,
         "class_correct": class_correct,
         "class_total": class_total,
@@ -341,9 +349,9 @@ def main():
         # 1. Avg Loss
         val_loss_avg = val_running_loss / val_total if val_total > 0 else 0.0
 
-        # 2. Top-K Accuracies
+        # 2. Accuracy
         val_preds = val_logits_all.argmax(dim=1)
-        val_acc1 = (val_preds == val_labels_all).float().mean().item() if val_total > 0 else 0.0
+        val_acc = (val_preds == val_labels_all).float().mean().item() if val_total > 0 else 0.0
 
         # 3. Macro AUC
         val_auc_macro = float("nan")
@@ -359,20 +367,20 @@ def main():
                 print(f"[warn] Val AUC failed: {e}")
 
         # Print Results
-        print(f"\n[EPOCH {epoch}] Train Metrics:\nLoss: {val_loss_avg:.4f} \nAcc1: {val_acc1:.4f} \nAUC: {val_auc_macro:.4f}\n")
+        print(f"\n[EPOCH {epoch}] Train Metrics:\nLoss: {val_loss_avg:.4f} \nAcc1: {val_acc:.4f} \nAUC: {val_auc_macro:.4f}\n")
 
 
-        # Step LR scheduler on top-1 accuracy
+        # Step LR scheduler on loss
         sched.step(val_loss_avg)
 
-        #sched.step(val_acc1)
-        if val_acc1 > best_acc:
+        #sched.step(val_acc)
+        if val_acc > best_acc:
             # --- NEW BEST MODEL HEADER ---
             print(f"\n{'#'*15} NEW BEST MODEL FOUND {'#'*15}")
-            print(f"Old Best: {best_acc:.4f} | New Best: {val_acc1:.4f}")
+            print(f"Old Best: {best_acc:.4f} | New Best: {val_acc:.4f}")
             print(f"Validation AUC: {val_auc_macro:.4f}")
             
-            best_acc = val_acc1
+            best_acc = val_acc
             best_auc = val_auc_macro
             best_train_auc = auc_macro_score
             epochs_no_improve = 0
@@ -403,7 +411,7 @@ def main():
                 print(f"{'!'*46}\n")
                 break
     
-    #print(f"Training done. Best top-1 acc: {best_acc:.4f}, AUC: {best_auc:4f}")
+    #print(f"Training done. Best acc: {best_acc:.4f}, AUC: {best_auc:4f}")
     end_time = time.time()
 
     duration = end_time - embed_time
