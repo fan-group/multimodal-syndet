@@ -7,6 +7,17 @@ This framework provides an end-to-end pipeline for **cross-domain deepfake analy
 
 The core of this project is a **unified inference engine** that abstracts the complexities of multiple VLM backbones into a single command-line interface, allowing for rapid benchmarking across different architectural families.
 
+## Supported Model Arguments:
+
+- clip-vit-base-patch32 https://arxiv.org/abs/2103.00020 
+
+- clip-vit-base-patch16 https://arxiv.org/abs/2103.00020 
+
+- clip-vit-large-patch14 https://arxiv.org/abs/2103.00020 
+
+- imagebind https://arxiv.org/abs/2305.05665 
+
+- flamingo9b https://arxiv.org/abs/2308.01390 
 
 ## ⚙️ Installation
 This project requires **Python 3.8**.
@@ -53,18 +64,6 @@ python cross_domain.py \
   --model imagebind \
   --batch_size 2
 ```
-
-## Supported Model Arguments:
-
-- clip-vit-base-patch32
-
-- clip-vit-base-patch16
-
-- clip-vit-base-large14
-
-- imagebind
-
-- flamingo9b
 
 ## 📚 References & Credits
 
