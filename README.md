@@ -32,7 +32,9 @@ This project requires **Python 3.8**.
 
    The PyTorch wheels are built for **CUDA 12.1**, so the target machine needs an NVIDIA driver supporting CUDA ≥ 12.1 (check with `nvidia-smi`).
 
+3. **(ImageBind only)** Download the pretrained checkpoint at https://pan.baidu.com/s/1jPgpi-zluxeXGUAPrqJv0Q?pwd=iuy7 and place it at `checkpoints/ckpt.pth`:
 
+   This step is only required if you intend to run the `imagebind` backbone. The CLIP and Flamingo backbones do not need it.
 
 ## 🏗️ Architecture
 1. **Feature Extraction:** Maps raw images to a unified latent space using the specified VLM.
