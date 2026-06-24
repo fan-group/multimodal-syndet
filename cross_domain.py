@@ -60,7 +60,7 @@ def evaluate(model, loader, device, num_classes):
     class_correct = np.zeros(num_classes, dtype=np.int64)
     class_total = np.zeros(num_classes, dtype=np.int64)
 
-    # For top-k & AUC
+    # For acc & AUC
     all_logits = []
     all_labels = []
 
@@ -91,7 +91,7 @@ def evaluate(model, loader, device, num_classes):
     avg_loss = total_loss / max(total, 1)
     acc = correct / max(total, 1)
 
-    # Concatenate for top-k and AUC
+    # Concatenate for acc and AUC
     logits_all = torch.cat(all_logits, dim=0)      # (N, C)
     labels_all = torch.cat(all_labels, dim=0)      # (N,)
 
@@ -120,7 +120,7 @@ def evaluate(model, loader, device, num_classes):
 
     metrics = {
         "avg_loss": avg_loss,
-        "top1": acc,
+        "acc": acc,
         "auc_macro": auc_macro_score,
         "class_correct": class_correct,
         "class_total": class_total,
@@ -242,12 +242,10 @@ def main():
     for epoch in range(1, args.epochs + 1):
         model.train()
         running_loss = 0.0
-        correct_top1 = 0
+        correct_acc = 0
         total = 0
 
-        top1_acc = 0
-        top2_acc = 0
-        top3_acc = 0
+        acc = 0
 
 
         # For metrics across the entire epoch
@@ -274,10 +272,10 @@ def main():
 
             # For metrics
             preds = logits.argmax(dim=1)
-            correct_top1 += (preds == lab).sum().item()
+            correct_acc += (preds == lab).sum().item()
             total += lab.size(0)
 
-            # Store logits / labels for top-k + AUC
+            # Store logits / labels for acc + AUC
             logits_list.append(logits.detach().cpu())
             labels_cpu = lab.detach().cpu()
             labels_list.append(labels_cpu)
@@ -298,9 +296,9 @@ def main():
 
         # ---- Epoch-level metrics ----
         epoch_loss = running_loss / len(train_ds)
-        top1_acc = correct_top1 / total if total > 0 else 0.0
+        acc = correct_acc / total if total > 0 else 0.0
 
-        # Concatenate logits/labels for top-k and AUC
+        # Concatenate logits/labels for acc and AUC
         logits_all = torch.cat(logits_list, dim=0)      # (N, C)
         labels_all = torch.cat(labels_list, dim=0)      # (N,)
 
@@ -319,7 +317,6 @@ def main():
 
         model.eval()
         val_running_loss = 0.0
-        val_correct_top1 = 0
         val_total = 0
 
         val_logits_list = []
@@ -338,7 +335,7 @@ def main():
                 val_running_loss += v_loss.item() * val_emb.size(0)
                 val_total += val_lab.size(0)
 
-                # Collect for Top-K and AUC
+                # Collect for acc and AUC
                 val_logits_list.append(val_logits.cpu())
                 val_labels_list.append(val_lab.cpu())
 
