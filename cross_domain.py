@@ -1,6 +1,13 @@
+import types
+import sys
+import torchvision.transforms.functional as _F
+
+_shim = types.ModuleType("torchvision.transforms.functional_tensor")
+_shim.rgb_to_grayscale = _F.rgb_to_grayscale
+sys.modules["torchvision.transforms.functional_tensor"] = _shim
+
 import argparse
 from embedding_generation import *
-import sys
 from sklearn.model_selection import train_test_split
 import os
 import time
@@ -19,6 +26,7 @@ try:
     _HAS_SKLEARN = True
 except ImportError:
     _HAS_SKLEARN = False
+
 
 
 def set_seed(seed):
@@ -52,7 +60,7 @@ def evaluate(model, loader, device, num_classes):
     class_correct = np.zeros(num_classes, dtype=np.int64)
     class_total = np.zeros(num_classes, dtype=np.int64)
 
-    # For top-k & AUC
+    # For acc & AUC
     all_logits = []
     all_labels = []
 
@@ -81,9 +89,9 @@ def evaluate(model, loader, device, num_classes):
             all_labels.append(lab.cpu())
 
     avg_loss = total_loss / max(total, 1)
-    acc_top1 = correct / max(total, 1)
+    acc = correct / max(total, 1)
 
-    # Concatenate for top-k and AUC
+    # Concatenate for acc and AUC
     logits_all = torch.cat(all_logits, dim=0)      # (N, C)
     labels_all = torch.cat(all_labels, dim=0)      # (N,)
 
@@ -112,7 +120,7 @@ def evaluate(model, loader, device, num_classes):
 
     metrics = {
         "avg_loss": avg_loss,
-        "top1": acc_top1,
+        "acc": acc,
         "auc_macro": auc_macro_score,
         "class_correct": class_correct,
         "class_total": class_total,
@@ -161,15 +169,18 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     #TODO add seed logic
+    
+
     if args.model in ['clip-vit-base-patch32', 'clip-vit-base-patch16', 'clip-vit-large-patch14']:
-        embeds = clip_embeddings(args)
+        embeds, embed_time = clip_embeddings(args)
     elif args.model == 'imagebind':
-        embeds = imagebind_embeddings(args)
+        embeds, embed_time = imagebind_embeddings(args)
     elif args.model == 'flamingo9b':
-        embeds = flamingo_embeddings(args)
+        embeds, embed_time = flamingo_embeddings(args)
     else:
         print("Input a correct model type")
         sys.exit(1)
+    
 
     X_train = embeds['train_embeds'].float().numpy() 
     y_train = embeds['train_labels'].numpy()
@@ -222,7 +233,6 @@ def main():
 
     print(f"Emb dim: {dim} | Train samples: {len(train_ds)} | Num classes: {num_classes}\n")
 
-    start_time = time.time()
     global_step = 0
     best_acc = -1.0
     best_auc = -1.0
@@ -232,12 +242,10 @@ def main():
     for epoch in range(1, args.epochs + 1):
         model.train()
         running_loss = 0.0
-        correct_top1 = 0
+        correct_acc = 0
         total = 0
 
-        top1_acc = 0
-        top2_acc = 0
-        top3_acc = 0
+        acc = 0
 
 
         # For metrics across the entire epoch
@@ -264,10 +272,10 @@ def main():
 
             # For metrics
             preds = logits.argmax(dim=1)
-            correct_top1 += (preds == lab).sum().item()
+            correct_acc += (preds == lab).sum().item()
             total += lab.size(0)
 
-            # Store logits / labels for top-k + AUC
+            # Store logits / labels for acc + AUC
             logits_list.append(logits.detach().cpu())
             labels_cpu = lab.detach().cpu()
             labels_list.append(labels_cpu)
@@ -281,16 +289,16 @@ def main():
                     class_correct[c] += (preds_cpu[mask] == labels_cpu[mask]).sum().item()
 
             if global_step % 50 == 0:
-                it_time = (time.time() - start_time) / max(global_step, 1)
+                #it_time = (time.time() - start_time) / max(global_step, 1)
          #       print(f"[ep {epoch} | step {global_step}] "
          #             f"loss={loss.item():.4f} | iter_time={it_time:.4f}s")
                 train_writer.add_scalar("loss/step", loss.item(), global_step)
 
         # ---- Epoch-level metrics ----
         epoch_loss = running_loss / len(train_ds)
-        top1_acc = correct_top1 / total if total > 0 else 0.0
+        acc = correct_acc / total if total > 0 else 0.0
 
-        # Concatenate logits/labels for top-k and AUC
+        # Concatenate logits/labels for acc and AUC
         logits_all = torch.cat(logits_list, dim=0)      # (N, C)
         labels_all = torch.cat(labels_list, dim=0)      # (N,)
 
@@ -299,27 +307,16 @@ def main():
         if _HAS_SKLEARN:
             probs_all = torch.softmax(logits_all, dim=1).numpy()
             y_true = labels_all.numpy()
-
             try:
-                if num_classes == 2:
-                    auc_macro_score = roc_auc_score(y_true, probs_all[:, 1])
-                else:
-                    auc_macro_score = roc_auc_score(
-                        y_true,
-                        probs_all,
-                        multi_class="ovr",
-                        average="macro"
-                    )
+                auc_macro_score = roc_auc_score(y_true, probs_all[:, 1])
             except Exception as e:
                 print(f"[warn] AUC computation failed: {e}")
-                auc_macro_score = float("nan")
         else:
             print("[warn] sklearn not installed, AUC will be NaN.")
 
 
         model.eval()
         val_running_loss = 0.0
-        val_correct_top1 = 0
         val_total = 0
 
         val_logits_list = []
@@ -338,7 +335,7 @@ def main():
                 val_running_loss += v_loss.item() * val_emb.size(0)
                 val_total += val_lab.size(0)
 
-                # Collect for Top-K and AUC
+                # Collect for acc and AUC
                 val_logits_list.append(val_logits.cpu())
                 val_labels_list.append(val_lab.cpu())
 
@@ -349,14 +346,9 @@ def main():
         # 1. Avg Loss
         val_loss_avg = val_running_loss / val_total if val_total > 0 else 0.0
 
-        # 2. Top-K Accuracies
-        def get_val_topk(k):
-            k = min(k, num_classes)
-            topk_indices = torch.topk(val_logits_all, k=k, dim=1).indices
-            correct = (topk_indices == val_labels_all.unsqueeze(1)).any(dim=1).float().sum().item()
-            return correct / val_total if val_total > 0 else 0.0
-
-        val_acc1 = get_val_topk(1)
+        # 2. Accuracy
+        val_preds = val_logits_all.argmax(dim=1)
+        val_acc = (val_preds == val_labels_all).float().mean().item() if val_total > 0 else 0.0
 
         # 3. Macro AUC
         val_auc_macro = float("nan")
@@ -372,20 +364,20 @@ def main():
                 print(f"[warn] Val AUC failed: {e}")
 
         # Print Results
-        print(f"\n[EPOCH {epoch}] Train Metrics:\nLoss: {val_loss_avg:.4f} \nAcc1: {val_acc1:.4f} \nAUC: {val_auc_macro:.4f}\n")
+        print(f"\n[EPOCH {epoch}] Train Metrics:\nLoss: {val_loss_avg:.4f} \nAcc1: {val_acc:.4f} \nAUC: {val_auc_macro:.4f}\n")
 
 
-        # Step LR scheduler on top-1 accuracy
+        # Step LR scheduler on loss
         sched.step(val_loss_avg)
 
-        #sched.step(val_acc1)
-        if val_acc1 > best_acc:
+        #sched.step(val_acc)
+        if val_acc > best_acc:
             # --- NEW BEST MODEL HEADER ---
             print(f"\n{'#'*15} NEW BEST MODEL FOUND {'#'*15}")
-            print(f"Old Best: {best_acc:.4f} | New Best: {val_acc1:.4f}")
+            print(f"Old Best: {best_acc:.4f} | New Best: {val_acc:.4f}")
             print(f"Validation AUC: {val_auc_macro:.4f}")
             
-            best_acc = val_acc1
+            best_acc = val_acc
             best_auc = val_auc_macro
             best_train_auc = auc_macro_score
             epochs_no_improve = 0
@@ -416,8 +408,12 @@ def main():
                 print(f"{'!'*46}\n")
                 break
     
-    #print(f"Training done. Best top-1 acc: {best_acc:.4f}, AUC: {best_auc:4f}")
+    #print(f"Training done. Best acc: {best_acc:.4f}, AUC: {best_auc:4f}")
+    end_time = time.time()
 
+    duration = end_time - embed_time
+    print(f"Total processing time: {duration:.4f} seconds")
+    
     model.eval()
     
 
