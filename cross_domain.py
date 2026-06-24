@@ -161,15 +161,18 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     #TODO add seed logic
+    
+
     if args.model in ['clip-vit-base-patch32', 'clip-vit-base-patch16', 'clip-vit-large-patch14']:
-        embeds = clip_embeddings(args)
+        embeds, embed_time = clip_embeddings(args)
     elif args.model == 'imagebind':
-        embeds = imagebind_embeddings(args)
+        embeds, embed_time = imagebind_embeddings(args)
     elif args.model == 'flamingo9b':
-        embeds = flamingo_embeddings(args)
+        embeds, embed_time = flamingo_embeddings(args)
     else:
         print("Input a correct model type")
         sys.exit(1)
+    
 
     X_train = embeds['train_embeds'].float().numpy() 
     y_train = embeds['train_labels'].numpy()
@@ -222,7 +225,6 @@ def main():
 
     print(f"Emb dim: {dim} | Train samples: {len(train_ds)} | Num classes: {num_classes}\n")
 
-    start_time = time.time()
     global_step = 0
     best_acc = -1.0
     best_auc = -1.0
@@ -281,7 +283,7 @@ def main():
                     class_correct[c] += (preds_cpu[mask] == labels_cpu[mask]).sum().item()
 
             if global_step % 50 == 0:
-                it_time = (time.time() - start_time) / max(global_step, 1)
+                #it_time = (time.time() - start_time) / max(global_step, 1)
          #       print(f"[ep {epoch} | step {global_step}] "
          #             f"loss={loss.item():.4f} | iter_time={it_time:.4f}s")
                 train_writer.add_scalar("loss/step", loss.item(), global_step)
@@ -299,20 +301,10 @@ def main():
         if _HAS_SKLEARN:
             probs_all = torch.softmax(logits_all, dim=1).numpy()
             y_true = labels_all.numpy()
-
             try:
-                if num_classes == 2:
-                    auc_macro_score = roc_auc_score(y_true, probs_all[:, 1])
-                else:
-                    auc_macro_score = roc_auc_score(
-                        y_true,
-                        probs_all,
-                        multi_class="ovr",
-                        average="macro"
-                    )
+                auc_macro_score = roc_auc_score(y_true, probs_all[:, 1])
             except Exception as e:
                 print(f"[warn] AUC computation failed: {e}")
-                auc_macro_score = float("nan")
         else:
             print("[warn] sklearn not installed, AUC will be NaN.")
 
@@ -350,13 +342,8 @@ def main():
         val_loss_avg = val_running_loss / val_total if val_total > 0 else 0.0
 
         # 2. Top-K Accuracies
-        def get_val_topk(k):
-            k = min(k, num_classes)
-            topk_indices = torch.topk(val_logits_all, k=k, dim=1).indices
-            correct = (topk_indices == val_labels_all.unsqueeze(1)).any(dim=1).float().sum().item()
-            return correct / val_total if val_total > 0 else 0.0
-
-        val_acc1 = get_val_topk(1)
+        val_preds = val_logits_all.argmax(dim=1)
+        val_acc1 = (val_preds == val_labels_all).float().mean().item() if val_total > 0 else 0.0
 
         # 3. Macro AUC
         val_auc_macro = float("nan")
@@ -417,7 +404,11 @@ def main():
                 break
     
     #print(f"Training done. Best top-1 acc: {best_acc:.4f}, AUC: {best_auc:4f}")
+    end_time = time.time()
 
+    duration = end_time - embed_time
+    print(f"Total processing time: {duration:.4f} seconds")
+    
     model.eval()
     
 

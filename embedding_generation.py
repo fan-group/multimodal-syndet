@@ -10,7 +10,7 @@ from torchvision.transforms import ToTensor
 from transformers import CLIPModel, CLIPImageProcessor
 from model.openllama import OpenLLAMAPEFTModel
 from huggingface_hub import hf_hub_download
-
+import time
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 IMG_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff", ".webp"}
@@ -62,6 +62,9 @@ def clip_embeddings(args):
         return torch.cat(all_feats, dim=0)
 
     # --- 4. Execution ---
+
+    start_time = time.time()
+
     train_embeds = get_features(train_paths, train_labels, "Processing Train")
     test_embeds = get_features(test_paths, test_labels, "Processing Test")
 
@@ -72,7 +75,7 @@ def clip_embeddings(args):
         'test_embeds': test_embeds,
         'test_paths': test_paths,
         'test_labels': torch.tensor(test_labels)
-    }
+    }, start_time
 
 
 
@@ -89,7 +92,7 @@ def imagebind_embeddings(args):
     # 1. Model Initialization (Done once)
     model_args = {
         'model': 'openllama_peft',
-        'ckpt_path': checkpoint_path,
+        'ckpt_path': 'checkpoint/ckpt.pth',
         'max_tgt_len': 128,
         'lora_r': 32,
         'lora_alpha': 32,
@@ -131,6 +134,8 @@ def imagebind_embeddings(args):
         return torch.cat(all_embeddings, dim=0)
 
     # --- 2. Process Train Set ---
+    start_time = time.time()
+
     train_paths, train_labels = get_paths_and_labels(args.real_train_path, args.fake_train_path)
     print(f"Extracting {len(train_paths)} training embeddings...")
     train_embeds = extract_features(train_paths, "Train")
@@ -148,7 +153,7 @@ def imagebind_embeddings(args):
         'test_embeds': test_embeds,
         'test_paths': [str(p) for p in test_paths],
         'test_labels': torch.tensor(test_labels)
-    }
+    }, start_time
 
 
 
@@ -201,6 +206,8 @@ def flamingo_embeddings(args):
         return torch.cat(all_embeds, dim=0)
 
     # --- 3. Execution for Train and Test ---
+    start_time = time.time()
+
     train_paths, train_labels = get_paths_and_labels(args.real_train_path, args.fake_train_path)
     train_embeds = extract_features(train_paths, "Flamingo Train")
 
@@ -215,4 +222,4 @@ def flamingo_embeddings(args):
         'test_embeds': test_embeds,
         'test_paths': [str(p) for p in test_paths],
         'test_labels': torch.tensor(test_labels)
-    }
+    }, start_time
