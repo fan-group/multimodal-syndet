@@ -149,7 +149,7 @@ def parse_args():
     #                    help='Proportion of test samples')
     parser.add_argument('--batch_size', type=int, default=128, 
                         help='Batch size for training')
-    parser.add_argument('--model', type=str, choices=['clip-vit-base-patch32', 'clip-vit-base-patch16', 'clip-vit-large-patch14', 'imagebind', 'flamingo9b'],
+    parser.add_argument('--model', type=str, choices=['clip-vit-base-patch32', 'clip-vit-base-patch16', 'clip-vit-large-patch14', 'imagebind', 'idefics9b'],
                         help='Foundation model to use for embedding generation')
     parser.add_argument("--logdir", type=str, default="./logs_linear_head",
                         help="Directory for TensorBoard logs and checkpoints")
@@ -175,8 +175,8 @@ def main():
         embeds, embed_time = clip_embeddings(args)
     elif args.model == 'imagebind':
         embeds, embed_time = imagebind_embeddings(args)
-    elif args.model == 'flamingo9b':
-        embeds, embed_time = flamingo_embeddings(args)
+    elif args.model == 'idefics9b':
+        embeds, embed_time = idefics_embeddings(args)
     else:
         print("Input a correct model type")
         sys.exit(1)
