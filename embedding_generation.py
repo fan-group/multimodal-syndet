@@ -149,7 +149,7 @@ def imagebind_embeddings(args):
 
 
 
-def flamingo_embeddings(args):
+def idefics_embeddings(args):
     # --- 1. Model Setup ---
     model_name = "HuggingFaceM4/idefics-9b"
     model = IdeficsForVisionText2Text.from_pretrained(
@@ -201,10 +201,10 @@ def flamingo_embeddings(args):
     start_time = time.time()
 
     train_paths, train_labels = get_paths_and_labels(args.real_train_path, args.fake_train_path)
-    train_embeds = extract_features(train_paths, "Flamingo Train")
+    train_embeds = extract_features(train_paths, "idefics Train")
 
     test_paths, test_labels = get_paths_and_labels(args.real_test_path, args.fake_test_path)
-    test_embeds = extract_features(test_paths, "Flamingo Test")
+    test_embeds = extract_features(test_paths, "idefics Test")
 
     # --- 4. Result Aggregation ---
     return {
