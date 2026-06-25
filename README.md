@@ -70,7 +70,7 @@ This framework is built upon and utilizes the following research and repositorie
 ### Inspired By 
 * **[Multimodal-Probes](https://github.com/peterhan91/Multimodal-Probes)** 
 * **[UniversalFakeDetect](https://github.com/WisconsinAIVision/UniversalFakeDetect)**
-* * **[LVLM-DFD](https://github.com/botianzhe/LVLM-DFD)** 
+* **[LVLM-DFD](https://github.com/botianzhe/LVLM-DFD)** 
 
 ### Dataset Sources
 * **[DiffFace](https://github.com/Rapisurazurite/DiffFace)** – Source for Diffusion-based synthetic imagery (DDIM).
