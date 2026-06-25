@@ -1,4 +1,4 @@
-# 🚀 Universal VLM: Modular Embedding & Classification Pipeline
+# 🚀 multimodal-syndet: Modular Embedding & Classification Pipeline
 
 **Project Status:** Implementation code for [Project Name]. Currently under review for publication; full release forthcoming.
 
@@ -11,15 +11,15 @@ This project requires **Python 3.8**.
 1. Create and activate an environment:
 
 ```bash
-   conda create --name universal_vlm python=3.8
-   conda activate universal_vlm
+   conda create --name multimodal-sydnet python=3.8
+   conda activate multimodal-sydnet
 ```
 
    Or with venv:
 
 ```bash
-   python3.8 -m venv universal_vlm
-   source universal_vlm/bin/activate
+   python3.8 -m venv multimodal-sydnet
+   source multimodal-sydnet/bin/activate
 ```
 
 2. Install dependencies:
