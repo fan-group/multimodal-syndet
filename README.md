@@ -32,7 +32,7 @@ This project requires **Python 3.8**.
 
 3. **(ImageBind only)** Download the pretrained checkpoint at **[imagebind_checkpoint](https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth) and place it at `checkpoints/ckpt.pth`:
 
-   This step is only required if you intend to run the `imagebind` backbone. The CLIP and Flamingo backbones do not need it.
+   This step is only required if you intend to run the `imagebind` backbone. The CLIP and IDEFICS backbones do not need it.
 
 ## 🏗️ Architecture
 1. **Feature Extraction:** Maps raw images to a unified latent space using the specified VLM.
