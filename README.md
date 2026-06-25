@@ -1,4 +1,4 @@
-# 🚀 multimodal-syndet: Modular Embedding & Classification Pipeline
+# 🚀 Multimodal-SynDet: Modular Embedding & Classification Pipeline
 
 **Project Status:** Implementation code for [Project Name]. Currently under review for publication; full release forthcoming.
 
