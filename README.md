@@ -30,7 +30,7 @@ This project requires **Python 3.8**.
 
    The PyTorch wheels are built for **CUDA 12.1**, so the target machine needs an NVIDIA driver supporting CUDA ≥ 12.1 (check with `nvidia-smi`).
 
-3. **(ImageBind only)** Download the pretrained checkpoint at https://pan.baidu.com/s/1jPgpi-zluxeXGUAPrqJv0Q?pwd=iuy7 and place it at `checkpoints/ckpt.pth`:
+3. **(ImageBind only)** Download the pretrained checkpoint at **[imagebind_checkpoint](https://dl.fbaipublicfiles.com/imagebind/imagebind_huge.pth) and place it at `checkpoints/ckpt.pth`:
 
    This step is only required if you intend to run the `imagebind` backbone. The CLIP and Flamingo backbones do not need it.
 
@@ -61,16 +61,16 @@ python cross_domain.py \
 
 - imagebind **[ImageBind](https://arxiv.org/abs/2305.05665)** 
 
-- flamingo9b **[Flamingo](https://arxiv.org/abs/2308.01390)**
+- idefics9b **[OBELICS](https://arxiv.org/abs/2306.16527)**
 
 ## 📚 References & Credits
 
 This framework is built upon and utilizes the following research and repositories:
 
-### Core Architectures & Pipelines
+### Inspired By 
 * **[Multimodal-Probes](https://github.com/peterhan91/Multimodal-Probes)** 
-* **[LVLM-DFD](https://github.com/botianzhe/LVLM-DFD)** 
-* **[UniversalFakeDetect](https://github.com/WisconsinAIVision/UniversalFakeDetect)** 
+* **[UniversalFakeDetect](https://github.com/WisconsinAIVision/UniversalFakeDetect)**
+* * **[LVLM-DFD](https://github.com/botianzhe/LVLM-DFD)** 
 
 ### Dataset Sources
 * **[DiffFace](https://github.com/Rapisurazurite/DiffFace)** – Source for Diffusion-based synthetic imagery (DDIM).
