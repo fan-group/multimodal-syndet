@@ -69,4 +69,4 @@ python cross_domain.py \
 * **[LVLM-DFD](https://github.com/botianzhe/LVLM-DFD)** 
 
 ### Dataset
-* **[DiffFace](https://github.com/Rapisurazurite/DiffFace)** – Source for real and synthetic images.
+* **[DiffusionFace](https://github.com/Rapisurazurite/DiffFace)** – Source for real and synthetic images.
