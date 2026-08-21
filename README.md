@@ -35,10 +35,10 @@ This project requires **Python 3.8**.
 ## 🏗️ Architecture
 1. **Feature Extraction:** Maps input images to a latent space using the specified image encoder.
 2. **Linear Probing:** Trains a linear classification layer on the training sample embeddings.
-3. **Evaluation:** Benchmarks the classifier on the test samples, and supports cross-domain evaluation where test synthetic samples are from a different generation method.
+3. **Evaluation:** Benchmarks the classifier on the test samples.
 
 ## 🛠️ Usage
-Execute cross-domain training and inference by specifying your dataset paths and selecting a model backbone:
+Execute training and inference by specifying your dataset paths and selecting a model backbone.  Cross-domain evaluation is supported by providing test samples from different sources.  
 
 ```
 python cross_domain.py \
