@@ -1,10 +1,10 @@
 # 🚀 Multimodal-SynDet: Modular Embedding & Classification Pipeline
 
-**Project Status:** Implementation code for **Pretrained Image Encoders of Vision-Language and Multimodal Models: An Evaluation on Synthetic Facial Image Detection**
+Implementation code for **Pretrained Image Encoders of Vision-Language and Multimodal Models: An Evaluation on Synthetic Facial Image Detection**
 
 ## ℹ️ Overview
-This framework provides an end-to-end pipeline for **cross-domain deepfake analysis**. It leverages state-of-the-art Vision-Language Models (VLMs) to extract high-dimensional embeddings, which are then used to train and evaluate linear classifiers for synthetic media detection.
-The purpose of this project is to probe the **separability of the vision backbones** of state-of-the-art Vision-Language Models for deepfake detection: by training a simple linear classifier on the extracted embeddings, it measures how well each backbone's representation space alone separates real from synthetic media.
+This project leverages image encoders of state-of-the-art Vision-Language (VLM) and Multimodal (MM) Models for accurate, efficient synthetic facial image detection.  A simple linear classifier is trained on sample embeddings extracted from the pretrained image encoder.  
+
 
 ## ⚙️ Installation
 This project requires **Python 3.8**.
