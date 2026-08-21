@@ -61,14 +61,12 @@ python cross_domain.py \
 
 - idefics9b **[OBELICS](https://arxiv.org/abs/2306.16527)**
 
-## 📚 References & Credits
-
-This framework is built upon and utilizes the following research and repositories:
+## 📚 References
 
 ### Inspired By 
 * **[Multimodal-Probes](https://github.com/peterhan91/Multimodal-Probes)** 
 * **[UniversalFakeDetect](https://github.com/WisconsinAIVision/UniversalFakeDetect)**
 * **[LVLM-DFD](https://github.com/botianzhe/LVLM-DFD)** 
 
-### Dataset Sources
-* **[DiffFace](https://github.com/Rapisurazurite/DiffFace)** – Source for Diffusion-based synthetic imagery (DDIM).
+### Dataset
+* **[DiffFace](https://github.com/Rapisurazurite/DiffFace)** – Source for real and synthetic images.
